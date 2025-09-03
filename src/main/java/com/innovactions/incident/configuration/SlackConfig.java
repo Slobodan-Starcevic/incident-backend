@@ -33,6 +33,9 @@ public class SlackConfig {
             var event = payload.getEvent();
             var userId = event.getUser();
             var text   = event.getText();
+            System.out.println(text);
+            text = text.replaceAll("<@[A-Z0-9]+(?:\\|[^>]+)?>", "").trim();
+            System.out.println(text);
 
             // Get slack username
             var reporterName = userId;
