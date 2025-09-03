@@ -29,6 +29,7 @@
 	<properties>
 		<java.version>21</java.version>
 		<spring-ai.version>1.0.1</spring-ai.version>
+        <slack.sdk.version>1.45.4</slack.sdk.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -104,6 +105,18 @@
 			<artifactId>spring-security-test</artifactId>
 			<scope>test</scope>
 		</dependency>
+        <!-- https://mvnrepository.com/artifact/com.slack.api/bolt -->
+        <dependency>
+            <groupId>com.slack.api</groupId>
+            <artifactId>bolt</artifactId>
+            <version>1.45.4</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.slack.api/bolt-servlet -->
+        <dependency>
+            <groupId>com.slack.api</groupId>
+            <artifactId>bolt-servlet</artifactId>
+            <version>1.45.4</version>
+        </dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
