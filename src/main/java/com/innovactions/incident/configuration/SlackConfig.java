@@ -3,7 +3,7 @@ package com.innovactions.incident.configuration;
 import com.slack.api.Slack;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.AppConfig;
-import com.slack.api.bolt.servlet.SlackAppServlet;
+import com.slack.api.bolt.jakarta_servlet.SlackAppServlet;
 import com.slack.api.methods.SlackApiException;
 import jakarta.servlet.Servlet;
 import org.springframework.beans.factory.annotation.Value;
