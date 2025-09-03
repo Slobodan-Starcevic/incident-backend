@@ -1,0 +1,10 @@
+spring:
+  docker:
+    compose:
+      enabled: false
+
+slack:
+  signingSecret: ${SLACK_SIGNING_SECRET:dummy-secret}
+  botTokenA: ${SLACK_BOT_TOKEN_A:dummy-a}
+  botTokenB: ${SLACK_BOT_TOKEN_B:dummy-b}
+  broadcastChannel: ${BROADCAST_CHANNEL:#incidents}

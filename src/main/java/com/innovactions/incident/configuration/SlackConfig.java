@@ -14,10 +14,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SlackConfig {
 
-    @Value("${SLACK_SIGNING_SECRET}")     private String signingSecret;
-    @Value("${SLACK_BOT_TOKEN_A}")        private String botTokenA; // listens/responds
-    @Value("${SLACK_BOT_TOKEN_B}")        private String botTokenB; // broadcasts
-    @Value("${BROADCAST_CHANNEL}")        private String broadcastChannel;
+    @Value("${slack.signingSecret}")            private String signingSecret;
+    @Value("${slack.botTokenA}")                private String botTokenA; // listens/responds
+    @Value("${slack.botTokenB}")                private String botTokenB; // broadcasts
+    @Value("${slack.broadcastChannel}")         private String broadcastChannel;
 
     @Bean
     public App slackApp() {
@@ -43,7 +43,7 @@ public class SlackConfig {
                 }
             } catch (Exception ignore) {}
 
-            // Categorize & assign (dummy for now until Yir's implementation
+            // Categorize & assign (dummy for now until Yir's implementation)
             var severity = categorize(text);
             var assigned = "Bob";
 
@@ -55,7 +55,7 @@ public class SlackConfig {
                     Details: %s
                     """.formatted(reporterName, severity, assigned, text);
 
-            // Reply in Workspace A (thread/channel where mentioned)
+            // Reply in Workspace A
             context.say("Incident noted! Assigned to *%s* with severity *%s*".formatted(assigned, severity));
 
             // Broadcast to Workspace B
