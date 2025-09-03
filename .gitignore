@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ### local dev ###
-setenv.sh
+setenv.ps1

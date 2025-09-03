@@ -14,10 +14,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class SlackConfig {
 
-    @Value("${slack.signingSecret}")    private String signingSecret;
-    @Value("${slack.botTokenA}")        private String botTokenA; // listens/responds
-    @Value("${slack.botTokenB}")        private String botTokenB; // broadcasts
-    @Value("${slack.broadcastChannel}") private String broadcastChannel;
+    @Value("${SLACK_SIGNING_SECRET}")     private String signingSecret;
+    @Value("${SLACK_BOT_TOKEN_A}")        private String botTokenA; // listens/responds
+    @Value("${SLACK_BOT_TOKEN_B}")        private String botTokenB; // broadcasts
+    @Value("${BROADCAST_CHANNEL}")        private String broadcastChannel;
 
     @Bean
     public App slackApp() {
@@ -28,24 +28,24 @@ public class SlackConfig {
 
         var app = new App(appConfig);
 
-        // === Handlers ===
-        app.event(com.slack.api.model.event.AppMentionEvent.class, (payload, ctx) -> {
+        // Setup listener
+        app.event(com.slack.api.model.event.AppMentionEvent.class, (payload, context) -> {
             var event = payload.getEvent();
             var userId = event.getUser();
             var text   = event.getText();
 
-            // Lookup reporter name
+            // Get slack username
             var reporterName = userId;
             try {
-                var info = ctx.client().usersInfo(r -> r.user(userId));
+                var info = context.client().usersInfo(r -> r.user(userId));
                 if (info.isOk() && info.getUser() != null && info.getUser().getProfile() != null) {
                     reporterName = info.getUser().getProfile().getRealName();
                 }
             } catch (Exception ignore) {}
 
-            // Categorize & assign
+            // Categorize & assign (dummy for now until Yir's implementation
             var severity = categorize(text);
-            var assigned = AssigneePool.next(); // simple round-robin
+            var assigned = "Bob";
 
             var summary = """
                     📢 New Incident Reported!
@@ -56,7 +56,7 @@ public class SlackConfig {
                     """.formatted(reporterName, severity, assigned, text);
 
             // Reply in Workspace A (thread/channel where mentioned)
-            ctx.say("Incident noted! Assigned to *%s* with severity *%s*".formatted(assigned, severity));
+            context.say("Incident noted! Assigned to *%s* with severity *%s*".formatted(assigned, severity));
 
             // Broadcast to Workspace B
             try {
@@ -64,22 +64,22 @@ public class SlackConfig {
                         .channel(broadcastChannel)
                         .text(summary));
             } catch (SlackApiException | java.io.IOException e) {
-                // log in real code
+                System.err.println("Slack API returned an error: " + e.getMessage());
             }
 
-            return ctx.ack();
+            return context.ack();
         });
 
         return app;
     }
 
-    // Register Bolt's servlet at /slack/events (handles URL verification + event dispatch)
+    // Register servlet
     @Bean
     public ServletRegistrationBean<Servlet> slackServlet(App app) {
         return new ServletRegistrationBean<>(new SlackAppServlet(app), "/slack/events");
     }
 
-    // ---- helpers ----
+    // dummy categorization for now.
     static String categorize(String text) {
         var t = text == null ? "" : text.toLowerCase();
         if (t.contains("urgent")) return "URGENT";

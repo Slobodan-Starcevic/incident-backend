@@ -108,7 +108,7 @@
         <!-- https://mvnrepository.com/artifact/com.slack.api/bolt -->
         <dependency>
             <groupId>com.slack.api</groupId>
-            <artifactId>bolt</artifactId>
+            <artifactId>bolt-jakarta-servlet</artifactId>
             <version>1.45.4</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/com.slack.api/bolt-servlet -->
