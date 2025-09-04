@@ -1,4 +1,5 @@
 spring:
+# Temp turned off, we will use compose in the future but for now its just throwing errors.
   docker:
     compose:
       enabled: false

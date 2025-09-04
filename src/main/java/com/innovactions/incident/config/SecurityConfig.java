@@ -1,4 +1,4 @@
-package com.innovactions.incident.configuration;
+package com.innovactions.incident.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

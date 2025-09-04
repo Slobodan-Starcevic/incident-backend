@@ -1,4 +1,4 @@
-package com.innovactions.incident.configuration;
+package com.innovactions.incident.config;
 
 import com.slack.api.Slack;
 import com.slack.api.bolt.App;
