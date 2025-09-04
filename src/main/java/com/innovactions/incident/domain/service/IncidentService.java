@@ -1,34 +1,41 @@
 package com.innovactions.incident.domain.service;
 
-import java.time.LocalDateTime;
+import com.innovactions.incident.application.command.CreateIncidentCommand;
+import com.innovactions.incident.domain.model.Incident;
+import com.innovactions.incident.domain.model.Severity;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
 
+@Slf4j
+@Service
 public class IncidentService {
 
-    private final CategorizationService categorizationService;
-    private final AssignmentService assignmentService;
+    public Incident createIncident(CreateIncidentCommand command) {
+        Severity severity = classify(command.message());
 
-    public IncidentService(CategorizationService categorizationService,
-                           AssignmentService assignmentService) {
-        this.categorizationService = categorizationService;
-        this.assignmentService = assignmentService;
-    }
+        String assignee = assign(command.message());
 
-    public IncidentEntity createIncident(String text, SlackUser reporter) {
-        var cleanText = cleanMentions(text);
-        var severity = categorizationService.categorize(cleanText);
-        var assignedDev = assignmentService.assignDeveloper(severity);
-
-        return new IncidentEntity(
-                reporter.id(),
-                reporter.realName(),
-                cleanText,
+        Incident incident = new Incident(
+                command.reporterId(),
+                command.reporterName(),
+                command.message(),
                 severity,
-                assignedDev,
-                LocalDateTime.now()
+                assignee
         );
+
+        log.info("Created new incident: {}", incident.getId());
+        return incident;
     }
 
-    private String cleanMentions(String text) {
-        return text.replaceAll("<@[A-Z0-9]+(?:\\|[^>]+)?>", "").trim();
+    private Severity classify(String message) {
+        if (message == null) return Severity.MINOR;
+        String t = message.toLowerCase();
+        if (t.contains("urgent")) return Severity.URGENT;
+        if (t.contains("fail") || t.contains("error")) return Severity.MAJOR;
+        return Severity.MINOR;
+    }
+
+    private String assign(String message) {
+        return "Bob";
     }
 }

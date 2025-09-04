@@ -12,12 +12,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // Slack won’t send CSRF tokens
+                .csrf(AbstractHttpConfigurer::disable) // CSRF off
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/slack/events").permitAll() // allow Slack events
-                        .anyRequest().authenticated() // everything else needs auth
+                        .requestMatchers("/slack/events").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .httpBasic(httpBasic -> {}); // enable HTTP Basic with default settings
+                .httpBasic(httpBasic -> {});
         return http.build();
     }
 }
