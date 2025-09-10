@@ -32,9 +32,9 @@ public class Incident {
 
     @NonNull
     private Severity severity;
-
-    @NonNull
-    private String assignee;
+//
+//    @NonNull
+//    private String assignee;
 
     private final Instant reportedAt = Instant.now();
 
@@ -53,18 +53,24 @@ public class Incident {
         this.status = Status.RESOLVED;
     }
 
-    public void reassign(String newAssignee) {
-        this.assignee = newAssignee;
-    }
+//    public void reassign(String newAssignee) {
+//        this.assignee = newAssignee;
+//    }
 
     public void updateDetails(String newDetails) {
         this.details = newDetails;
     }
-
     public String summary() {
-        return "📢 Incident [" + severity + "] — Assigned to " + assignee +
+        return "📢 Incident [" + severity + "] — Assigned to " +
                 " | Reporter: " + reporterName +
                 " | Status: " + status +
                 " | Details: " + details;
     }
+
+//    public String summary() {
+//        return "📢 Incident [" + severity + "] — Assigned to " + assignee +
+//                " | Reporter: " + reporterName +
+//                " | Status: " + status +
+//                " | Details: " + details;
+//    }
 }
