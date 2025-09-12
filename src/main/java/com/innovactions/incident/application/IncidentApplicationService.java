@@ -16,18 +16,15 @@ public class IncidentApplicationService implements IncidentInboundPort {
 
     private final IncidentService incidentService;
     private final IncidentBroadcasterPort broadcaster;
-    private final SeverityClassifierPort severityClassifier;  // ⬅️ new
+    private final SeverityClassifierPort severityClassifier;
 
     @Override
     public void handle(CreateIncidentCommand command) {
-        // Classify with OpenAI (or heuristic fallback)
         Severity severity = severityClassifier.classify(command.message());
 
-        // Create the incident with the chosen severity
         Incident incident = incidentService.createIncident(command, severity);
 
         broadcaster.broadcast(incident);
 
-        // (Ack-in-channel stays in SlackConfig via context.say for now)
     }
 }
