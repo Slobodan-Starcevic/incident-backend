@@ -17,7 +17,8 @@ public class SecurityConfig {
                         .requestMatchers("/slack/events").permitAll()
                         .anyRequest().authenticated()
                 )
-                .httpBasic(httpBasic -> {});
+                .httpBasic(httpBasic -> {
+                });
         return http.build();
     }
 }

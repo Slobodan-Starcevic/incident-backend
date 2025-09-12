@@ -1,8 +1,22 @@
 spring:
-# Temp turned off, we will use compose in the future but for now its just throwing errors.
   docker:
     compose:
       enabled: false
+  ai:
+    vertex:
+      ai:
+        gemini:
+          project-id: ${GOOGLE_PROJECT_ID}
+          location: europe-west4
+          chat:
+            options:
+              model: gemini-1.5-flash
+              temperature: 0.2
+            enabled: true
+          embedding:
+            options:
+              model: text-embedding-004
+            enabled: true
 
 slack:
   signingSecret: ${SLACK_SIGNING_SECRET}

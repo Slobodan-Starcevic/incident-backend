@@ -1,12 +1,6 @@
 package com.innovactions.incident.domain.model;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.RequiredArgsConstructor;
-import lombok.NonNull;
-import org.jetbrains.annotations.NotNull;
+import lombok.*;
 
 import java.time.Instant;
 import java.util.UUID;
@@ -38,7 +32,7 @@ public class Incident {
 
     private final Instant reportedAt = Instant.now();
 
-    private Status status =  Status.OPEN;
+    private Status status = Status.OPEN;
 
     public boolean escalate() {
         return severity.next()
