@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class IncidentService {
 
-    public Incident createIncident(CreateIncidentCommand command) {
-        Severity severity = classify(command.message());
-
+    public Incident createIncident(CreateIncidentCommand command, Severity severity) {
         String assignee = assign(command.message());
 
         Incident incident = new Incident(
@@ -25,14 +23,6 @@ public class IncidentService {
 
         log.info("Created new incident: {}", incident.getId());
         return incident;
-    }
-
-    private Severity classify(String message) {
-        if (message == null) return Severity.MINOR;
-        String t = message.toLowerCase();
-        if (t.contains("urgent")) return Severity.URGENT;
-        if (t.contains("fail") || t.contains("error")) return Severity.MAJOR;
-        return Severity.MINOR;
     }
 
     private String assign(String message) {
