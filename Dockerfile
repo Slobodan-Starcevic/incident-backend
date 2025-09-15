@@ -1,17 +1,28 @@
-# Step 1: Use an official OpenJDK base image from Docker Hub
-FROM openjdk:21-jdk
+# ========================
+# Stage 1: Build the JAR
+# ========================
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS build
 
-# Step 2: Set the working directory inside the container
 WORKDIR /app
 
-# Step 3: Copy the Spring Boot JAR file into the container
-COPY target/incident-0.0.1-SNAPSHOT.jar /app/incident-0.0.1-SNAPSHOT.jar
+COPY pom.xml .
 
-# Step 4: Copy the application.yml configuration file from the root of the project
-COPY application.yaml /app/application.yaml
+RUN mvn dependency:go-offline -B
 
-# Step 5: Expose the port your application runs on
+COPY src ./src
+
+RUN mvn clean package -DskipTests
+
+
+# ========================
+# Stage 2: Run the JAR
+# ========================
+FROM eclipse-temurin:21-jre-alpine
+
+WORKDIR /app
+
+COPY --from=build /app/target/incident-0.0.1-SNAPSHOT.jar app.jar
+
 EXPOSE 8080
 
-# Step 6: Define the command to run your Spring Boot application
-CMD ["java", "-jar", "/app/incident-0.0.1-SNAPSHOT.jar"]
+ENTRYPOINT ["java", "-jar", "app.jar"]
