@@ -4,16 +4,23 @@ import com.innovactions.incident.domain.model.Severity;
 import com.innovactions.incident.port.outbound.SeverityClassifierPort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.ai.chat.client.ChatClient;
-import org.springframework.ai.chat.model.ChatModel;
 import org.springframework.stereotype.Component;
+import com.google.genai.Client;
+import com.google.genai.types.GenerateContentResponse;
+
+import java.util.Objects;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class AiClassifier implements SeverityClassifierPort {
+public class GeminiIncidentClassifier implements SeverityClassifierPort {
 
-    private final ChatModel chatModel;
+    private final Client client;
+
+    public GeminiIncidentClassifier() {
+        // Reads GEMINI_API_KEY from environment variable
+        this.client = new Client();
+    }
 
     @Override
     public Severity classify(String message) {
@@ -34,17 +41,17 @@ public class AiClassifier implements SeverityClassifierPort {
                  ---
                 """.formatted(message == null ? "" : message);
 
-        String response = ChatClient.create(chatModel)
-                .prompt(prompt)
-                .call()
-                .content();
+        GenerateContentResponse response = client.models.generateContent(
+                "gemini-2.5-flash",
+                prompt,
+                null
+        );
 
-        log.info("AI classified incident message '{}' as '{}'", message, response);
+        log.info("Gemini AI classified incident message '{}' as '{}'", message, response);
 
         try {
-            assert response != null;
-            return Severity.valueOf(response.trim().toUpperCase());
-        } catch (IllegalArgumentException e) {
+            return Severity.valueOf(Objects.requireNonNull(response.text()).trim().toUpperCase());
+        } catch (NullPointerException e) {
             log.warn("Could not map response '{}', falling back to MINOR", response);
             return Severity.MINOR;
         }
