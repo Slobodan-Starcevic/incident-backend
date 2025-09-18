@@ -13,6 +13,8 @@ import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.concurrent.CompletableFuture;
+
 @Configuration
 public class SlackConfig {
 
@@ -31,12 +33,22 @@ public class SlackConfig {
 
         var app = new App(appConfig);
 
-        app.event(com.slack.api.model.event.AppMentionEvent.class,
-                (payload, context) -> {
+        app.event(com.slack.api.model.event.AppMentionEvent.class, (payload, context) -> {
+            // acknowledge the event so slack doesnt retry
+            var ack = context.ack();
+
+            // process async
+            CompletableFuture.runAsync(() -> {
+                try {
                     slackInboundAdapter.handle(payload.getEvent(), context);
                     context.say("Incident noted! Thanks, we’ll look into it.");
-                    return context.ack();
-                });
+                } catch (Exception e) {
+                    // pass
+                }
+            });
+
+            return ack;
+        });
 
         return app;
     }
