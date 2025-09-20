@@ -2,12 +2,15 @@ package com.innovactions.incident.config;
 
 import com.innovactions.incident.adapter.inbound.SlackInboundAdapter;
 import com.innovactions.incident.adapter.outbound.SlackBroadcaster;
+import com.innovactions.incident.domain.service.IncidentClosureService;
 import com.innovactions.incident.port.inbound.IncidentInboundPort;
 import com.innovactions.incident.port.outbound.IncidentBroadcasterPort;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.AppConfig;
 import com.slack.api.bolt.jakarta_servlet.SlackAppServlet;
 import jakarta.servlet.Servlet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.ServletRegistrationBean;
 import org.springframework.context.annotation.Bean;
@@ -18,6 +21,8 @@ import java.util.concurrent.CompletableFuture;
 @Configuration
 public class SlackConfig {
 
+    private static final Logger log = LoggerFactory.getLogger(SlackConfig.class);
+
     @Value("${slack.signingSecret}")
     private String signingSecret;
 
@@ -25,7 +30,7 @@ public class SlackConfig {
     private String botTokenA;
 
     @Bean
-    public App slackApp(SlackInboundAdapter slackInboundAdapter) {
+    public App slackApp(SlackInboundAdapter slackInboundAdapter, IncidentClosureService incidentClosureService) {
         var appConfig = AppConfig.builder()
                 .signingSecret(signingSecret)
                 .singleTeamBotToken(botTokenA)
@@ -50,6 +55,24 @@ public class SlackConfig {
             return ack;
         });
 
+        // add slash command for closing incidents
+        app.command("/close_incident", (req, ctx) -> {
+            String developerUserId = req.getPayload().getUserId();
+            String channelId = req.getPayload().getChannelId();
+            String reason = req.getPayload().getText() != null ? req.getPayload().getText() : "No reason provided";
+
+            // process incident closure asynchronously
+            CompletableFuture.runAsync(() -> {
+                try {
+                    incidentClosureService.closeIncident(developerUserId, channelId, reason);
+                } catch (Exception e) {
+                    log.error("Error processing incident closure: {}", e.getMessage(), e);
+                }
+            });
+
+            return ctx.ack("Processing incident closure...");
+        });
+
         return app;
     }
 
@@ -57,6 +80,7 @@ public class SlackConfig {
     public ServletRegistrationBean<Servlet> slackServlet(App app) {
         return new ServletRegistrationBean<>(new SlackAppServlet(app), "/slack/events");
     }
+
 
     @Bean
     public SlackInboundAdapter slackIncomingAdapter(IncidentInboundPort incidentInboundPort) {
@@ -66,9 +90,18 @@ public class SlackConfig {
     @Bean
     public IncidentBroadcasterPort slackBroadcaster(
             @Value("${slack.botTokenB}") String botTokenB,
-            @Value("${slack.broadcastChannel}") String broadcastChannel
+            @Value("${slack.developerUserId}") String developerUserId,
+            com.innovactions.incident.domain.service.ChannelNameGenerator channelNameGenerator
     ) {
-        return new SlackBroadcaster(botTokenB, broadcastChannel);
+        return new SlackBroadcaster(botTokenB, developerUserId, channelNameGenerator);
+    }
+
+    @Bean
+    public IncidentClosureService incidentClosureService(
+            @Value("${slack.botTokenB}") String botTokenB,
+            @Value("${slack.botTokenA}") String botTokenA
+    ) {
+        return new IncidentClosureService(botTokenB, botTokenA);
     }
 
 }
