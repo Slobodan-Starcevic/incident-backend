@@ -31,4 +31,24 @@ public class SlackBroadcaster implements IncidentBroadcasterPort {
             log.error("Failed to broadcast incident [{}] to Slack: {}", incident.getId(), e.getMessage(), e);
         }
     }
+//@Override
+//public void broadcast(Incident incident) {
+//    System.out.println("starting broadcasting");
+//    try {
+//        var response = Slack.getInstance().methods(botToken).chatPostMessage(req -> req
+//                .channel(channelId)
+//                .text(incident.summary())
+//        );
+//
+//        if (response.isOk()) {
+//
+//            log.info("Incident broadcasted to Slack: {}", incident.getId());
+//        } else {
+//
+//            log.error("Slack API error: {} (incident: {})", response.getError(), incident.getId());
+//        }
+//    } catch (IOException | SlackApiException e) {
+//        log.error("Slack API call failed for incident [{}]: {}", incident.getId(), e.getMessage(), e);
+//    }
+//}
 }

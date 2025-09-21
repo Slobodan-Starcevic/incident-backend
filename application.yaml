@@ -21,5 +21,7 @@ spring:
 slack:
   signingSecret: ${SLACK_SIGNING_SECRET}
   botTokenA: ${SLACK_BOT_TOKEN_A}
-  botTokenB: ${SLACK_BOT_TOKEN_B}
+#  botTokenB: ${SLACK_BOT_TOKEN_B}
   broadcastChannel: ${BROADCAST_CHANNEL}
+whatsapp:
+  verifyToken: ${VERIFY_TOKEN}

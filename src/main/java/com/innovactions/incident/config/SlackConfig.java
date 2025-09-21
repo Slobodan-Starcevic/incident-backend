@@ -50,13 +50,19 @@ public class SlackConfig {
     public SlackInboundAdapter slackIncomingAdapter(IncidentInboundPort incidentInboundPort) {
         return new SlackInboundAdapter(incidentInboundPort);
     }
-
     @Bean
     public IncidentBroadcasterPort slackBroadcaster(
-            @Value("${slack.botTokenB}") String botTokenB,
+            @Value("${slack.botTokenA}") String botTokenA,
             @Value("${slack.broadcastChannel}") String broadcastChannel
     ) {
-        return new SlackBroadcaster(botTokenB, broadcastChannel);
+        return new SlackBroadcaster(botTokenA, broadcastChannel);
     }
+//    @Bean
+//    public IncidentBroadcasterPort slackBroadcaster(
+//            @Value("${slack.botTokenA}") String botTokenB,
+//            @Value("${slack.broadcastChannel}") String broadcastChannel
+//    ) {
+//        return new SlackBroadcaster(botTokenB, broadcastChannel);
+//    }
 
 }
