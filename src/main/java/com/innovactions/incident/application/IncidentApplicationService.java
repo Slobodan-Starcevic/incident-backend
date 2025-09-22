@@ -1,11 +1,13 @@
 package com.innovactions.incident.application;
 
+import com.innovactions.incident.application.command.CloseIncidentCommand;
 import com.innovactions.incident.application.command.CreateIncidentCommand;
 import com.innovactions.incident.domain.model.Incident;
 import com.innovactions.incident.domain.model.Severity;
 import com.innovactions.incident.domain.service.IncidentService;
 import com.innovactions.incident.port.inbound.IncidentInboundPort;
 import com.innovactions.incident.port.outbound.IncidentBroadcasterPort;
+import com.innovactions.incident.port.outbound.IncidentClosurePort;
 import com.innovactions.incident.port.outbound.SeverityClassifierPort;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +19,7 @@ public class IncidentApplicationService implements IncidentInboundPort {
     private final IncidentService incidentService;
     private final IncidentBroadcasterPort broadcaster;
     private final SeverityClassifierPort severityClassifier;
+    private final IncidentClosurePort incidentClosurePort;
 
     @Override
     public void handle(CreateIncidentCommand command) {
@@ -26,5 +29,10 @@ public class IncidentApplicationService implements IncidentInboundPort {
 
         broadcaster.broadcast(incident);
 
+    }
+
+    @Override
+    public void closeIncident(CloseIncidentCommand incidentCommand) {
+        incidentClosurePort.closeIncident(incidentCommand.developerUserId(), incidentCommand.channelId(), incidentCommand.reason());
     }
 }

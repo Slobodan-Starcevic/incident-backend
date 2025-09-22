@@ -56,9 +56,9 @@ public class Incident {
     }
 
     public String summary() {
-        return "📢 Incident [" + severity + "] — Assigned to " + assignee +
-                " | Reporter: " + reporterName +
-                " | Status: " + status +
+        return "📢 Incident [" + severity + "] — Assigned to " + assignee + "\n" +
+                " | Reporter: " + reporterName + "\n" +
+                " | Status: " + status + "\n" +
                 " | Details: " + details;
     }
 }
