@@ -1,4 +1,4 @@
-package com.innovactions.incident.adapter.inbound;
+package com.innovactions.incident.adapter.inbound.slack;
 
 import com.innovactions.incident.application.command.CreateIncidentCommand;
 import com.innovactions.incident.port.inbound.IncidentInboundPort;
@@ -11,11 +11,11 @@ import com.slack.api.model.event.AppMentionEvent;
 import java.io.IOException;
 import java.time.Instant;
 
-public class SlackInboundAdapter {
+public class SlackCreateIncident {
 
     private final IncidentInboundPort incidentInboundPort;
 
-    public SlackInboundAdapter(IncidentInboundPort incidentInboundPort) {
+    public SlackCreateIncident(IncidentInboundPort incidentInboundPort) {
         this.incidentInboundPort = incidentInboundPort;
     }
 

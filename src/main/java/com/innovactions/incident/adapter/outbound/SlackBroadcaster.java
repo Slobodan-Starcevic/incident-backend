@@ -10,16 +10,14 @@ import com.slack.api.methods.response.conversations.ConversationsCreateResponse;
 import com.slack.api.methods.response.conversations.ConversationsInviteResponse;
 import com.slack.api.methods.response.conversations.ConversationsSetTopicResponse;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
+import java.util.List;
 
-
+@Slf4j
 @RequiredArgsConstructor
 public class SlackBroadcaster implements IncidentBroadcasterPort {
-
-    private static final Logger log = LoggerFactory.getLogger(SlackBroadcaster.class);
 
     private final String botToken;
     private final String developerUserId;
@@ -30,8 +28,6 @@ public class SlackBroadcaster implements IncidentBroadcasterPort {
         try {
             // generate channel name based on severity and timestamp
             String channelName = channelNameGenerator.generateChannelName(incident.getSeverity());
-
-            System.out.println(channelName);
             
             // create new channel in workspace B
             ConversationsCreateResponse createResponse = Slack.getInstance().methods(botToken)
@@ -63,7 +59,7 @@ public class SlackBroadcaster implements IncidentBroadcasterPort {
             ConversationsInviteResponse inviteResponse = Slack.getInstance().methods(botToken)
                     .conversationsInvite(req -> req
                             .channel(channelId)
-                            .users(java.util.List.of(developerUserId))
+                            .users(List.of(developerUserId))
                     );
             
             if (!inviteResponse.isOk()) {

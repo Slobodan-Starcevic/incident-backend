@@ -1,10 +1,12 @@
 package com.innovactions.incident.config;
 
-import com.innovactions.incident.adapter.inbound.SlackInboundAdapter;
+import com.innovactions.incident.adapter.inbound.slack.SlackCloseIncident;
+import com.innovactions.incident.adapter.inbound.slack.SlackCreateIncident;
 import com.innovactions.incident.adapter.outbound.SlackBroadcaster;
-import com.innovactions.incident.domain.service.IncidentClosureService;
+import com.innovactions.incident.adapter.outbound.SlackIncidentClosureBroadcaster;
 import com.innovactions.incident.port.inbound.IncidentInboundPort;
 import com.innovactions.incident.port.outbound.IncidentBroadcasterPort;
+import com.innovactions.incident.port.outbound.IncidentClosurePort;
 import com.slack.api.bolt.App;
 import com.slack.api.bolt.AppConfig;
 import com.slack.api.bolt.jakarta_servlet.SlackAppServlet;
@@ -30,7 +32,7 @@ public class SlackConfig {
     private String botTokenA;
 
     @Bean
-    public App slackApp(SlackInboundAdapter slackInboundAdapter, IncidentClosureService incidentClosureService) {
+    public App slackApp(SlackCreateIncident slackInboundAdapter, SlackCloseIncident slackCloseIncident) {
         var appConfig = AppConfig.builder()
                 .signingSecret(signingSecret)
                 .singleTeamBotToken(botTokenA)
@@ -57,16 +59,13 @@ public class SlackConfig {
 
         // add slash command for closing incidents
         app.command("/close_incident", (req, ctx) -> {
-            String developerUserId = req.getPayload().getUserId();
-            String channelId = req.getPayload().getChannelId();
-            String reason = req.getPayload().getText() != null ? req.getPayload().getText() : "No reason provided";
-
-            // process incident closure asynchronously
+            // process async
             CompletableFuture.runAsync(() -> {
                 try {
-                    incidentClosureService.closeIncident(developerUserId, channelId, reason);
+                    slackCloseIncident.handle(req, ctx);
+                    ctx.say("Incident noted! Thanks, we’ll look into it.");
                 } catch (Exception e) {
-                    log.error("Error processing incident closure: {}", e.getMessage(), e);
+                    // pass
                 }
             });
 
@@ -83,8 +82,13 @@ public class SlackConfig {
 
 
     @Bean
-    public SlackInboundAdapter slackIncomingAdapter(IncidentInboundPort incidentInboundPort) {
-        return new SlackInboundAdapter(incidentInboundPort);
+    public SlackCreateIncident slackIncomingAdapter(IncidentInboundPort incidentInboundPort) {
+        return new SlackCreateIncident(incidentInboundPort);
+    }
+
+    @Bean
+    public SlackCloseIncident slackCloseIncident(IncidentInboundPort incidentInboundPort) {
+        return new SlackCloseIncident(incidentInboundPort);
     }
 
     @Bean
@@ -97,11 +101,11 @@ public class SlackConfig {
     }
 
     @Bean
-    public IncidentClosureService incidentClosureService(
+    public IncidentClosurePort incidentClosureBroadcaster(
             @Value("${slack.botTokenB}") String botTokenB,
             @Value("${slack.botTokenA}") String botTokenA
     ) {
-        return new IncidentClosureService(botTokenB, botTokenA);
+        return new SlackIncidentClosureBroadcaster(botTokenB, botTokenA);
     }
 
 }
