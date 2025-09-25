@@ -11,8 +11,8 @@ The backend is responsible for handling incidents and exposing APIs for differen
 
 * **Company:** Innovactions
 * **Type:** School project
-* **Goal:** Build a prototype incident management system that integrates with real communication tools.
-* **Phase:** MVP (hack together a first working version to validate direction and gather feedback).
+* **Goal:** Build an incident management system that integrates with real communication tools.
+* **Phase:** V1, expand the Slack integration, integrate WhatsApp and thoroughly test the system.
 
 ## Tech Stack
 
@@ -22,11 +22,10 @@ The backend is responsible for handling incidents and exposing APIs for differen
 * Database: PostgreSQL
 * Messaging/Integrations: Slack, WhatsApp, Email
 
-## Planned Integrations
+## Integrations
 
-* **Slackbot**: Allow users to report and follow up incidents directly from Slack.
+* **Slackbot**: Allow users to report and follow-up incidents directly from Slack.
 * **WhatsApp**: Future extension for incident notifications or reporting.
-* **Email**: For alerts, summaries, or fallback communication.
 
 ### Prerequisites
 
@@ -36,13 +35,11 @@ The backend is responsible for handling incidents and exposing APIs for differen
 
 ## Development Notes
 
-* **MVP focus:** hack together something functional, don’t over-engineer yet.
-* Code quality and structure will evolve as we learn what works best.
-* Future phases may add:
-
-    * Persistent database storage
-    * More integrations
-    * More complex determination system (AI possible)
+* MVP is implemented and functional
+* Slack integration with dynamic channels complete
+* Focus on WhatsApp integration
+* Implement CI/CD with dockerization
+* Test existing code and make sure new code is always tested before merging
 
 ## Contributors
 
